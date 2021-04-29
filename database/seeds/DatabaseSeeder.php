@@ -12,6 +12,12 @@ class DatabaseSeeder extends Seeder
             PermissionRoleTableSeeder::class,
             UsersTableSeeder::class,
             RoleUserTableSeeder::class,
+            OuathSeeder::class,
+            CountriesSeeder::class,
+            CourseSeeder::class,
+            LevelsSeeder::class,
+            UniversitesSeeder::class,
+
         ]);
     }
 }

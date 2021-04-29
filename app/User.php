@@ -10,12 +10,13 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
     use SoftDeletes;
-    use Notifiable ,HasApiTokens;
+    use Notifiable, HasApiTokens;
 
     public $table = 'users';
 
@@ -31,13 +32,15 @@ class User extends Authenticatable
         'deleted_at',
     ];
 
+    protected $appends = ['reviewedRating', 'IsFavorite'];
+
     protected $fillable = [
         'name',
         'email',
         'email_verified_at',
         'password',
         'remember_token',
-        'verfiy',
+        'verify',
         'phone',
         'sex',
         'age',
@@ -107,5 +110,47 @@ class User extends Authenticatable
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function findForPassport($username)
+    {
+        // dd($username );
+        $user = $this->where('phone', $username)->first();
+
+        return $user;
+    }
+
+    public function reviewer()
+    {
+        return $this->hasMany(Review::class, 'reviewer_id');
+
+    }
+
+    public function reviewed()
+    {
+        return $this->hasMany(Review::class, 'reviewed_id');
+
+    }
+
+    public function favoriteTeacher()
+    {
+        return $this->hasMany(Vaforite::class, 'tutor_id');
+
+    }
+
+    public function getReviewedRatingAttribute()
+    {
+        return $this->reviewed()->avg('review') ?: 0;
+    }
+
+    public function getIsFavoriteAttribute()
+    {
+        if(!Auth::check()){
+            return 0 ;
+
+        }
+        $cheackIsFavorite = $this->favoriteTeacher()->where('user_id', Auth::guard('api')->id())->count();
+
+        return $cheackIsFavorite > 0 ? 1:0 ;
     }
 }

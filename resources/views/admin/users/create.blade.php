@@ -58,14 +58,14 @@
                 <span class="help-block">{{ trans('cruds.user.fields.roles_helper') }}</span>
             </div>
             <div class="form-group">
-                <label for="verfiy">{{ trans('cruds.user.fields.verfiy') }}</label>
-                <input class="form-control {{ $errors->has('verfiy') ? 'is-invalid' : '' }}" type="text" name="verfiy" id="verfiy" value="{{ old('verfiy', '') }}">
-                @if($errors->has('verfiy'))
+                <label for="verify">{{ trans('cruds.user.fields.verify') }}</label>
+                <input class="form-control {{ $errors->has('verify') ? 'is-invalid' : '' }}" type="text" name="verify" id="verify" value="{{ old('verify', '') }}">
+                @if($errors->has('verify'))
                     <div class="invalid-feedback">
-                        {{ $errors->first('verfiy') }}
+                        {{ $errors->first('verify') }}
                     </div>
                 @endif
-                <span class="help-block">{{ trans('cruds.user.fields.verfiy_helper') }}</span>
+                <span class="help-block">{{ trans('cruds.user.fields.verify_helper') }}</span>
             </div>
             <div class="form-group">
                 <label for="phone">{{ trans('cruds.user.fields.phone') }}</label>

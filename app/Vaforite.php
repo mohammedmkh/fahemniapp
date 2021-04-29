@@ -2,42 +2,45 @@
 
 namespace App;
 
-use \DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property integer $id
+ * @property integer $user_id
+ * @property integer $tutor_id
+ * @property string $created_at
+ * @property string $updated_at
+ * @property string $deleted_at
+ * @property User $teacher
+ * @property User $student
+ */
 class Vaforite extends Model
 {
-    use SoftDeletes;
+    /**
+     * The "type" of the auto-incrementing ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'integer';
 
-    public $table = 'vaforites';
+    /**
+     * @var array
+     */
+    protected $fillable = ['user_id', 'tutor_id', 'created_at', 'updated_at', 'deleted_at'];
 
-    protected $dates = [
-        'created_at',
-        'updated_at',
-        'deleted_at',
-    ];
-
-    protected $fillable = [
-        'user_id',
-        'tutor_id',
-        'created_at',
-        'updated_at',
-        'deleted_at',
-    ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function tutor()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function teacher()
     {
         return $this->belongsTo(User::class, 'tutor_id');
     }
 
-    protected function serializeDate(DateTimeInterface $date)
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function student()
     {
-        return $date->format('Y-m-d H:i:s');
+        return $this->belongsTo(User::class,'user_id');
     }
 }

@@ -37,7 +37,7 @@
                         {{ trans('cruds.user.fields.roles') }}
                     </th>
                     <th>
-                        {{ trans('cruds.user.fields.verfiy') }}
+                        {{ trans('cruds.user.fields.verify') }}
                     </th>
                     <th>
                         {{ trans('cruds.user.fields.phone') }}
@@ -127,7 +127,7 @@
 { data: 'email', name: 'email' },
 { data: 'email_verified_at', name: 'email_verified_at' },
 { data: 'roles', name: 'roles.title' },
-{ data: 'verfiy', name: 'verfiy' },
+{ data: 'verify', name: 'verify' },
 { data: 'phone', name: 'phone' },
 { data: 'sex', name: 'sex' },
 { data: 'age', name: 'age' },
@@ -148,7 +148,7 @@
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 });
 
 </script>
