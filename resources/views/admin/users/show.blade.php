@@ -59,10 +59,10 @@
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.user.fields.verfiy') }}
+                            {{ trans('cruds.user.fields.verify') }}
                         </th>
                         <td>
-                            {{ $user->verfiy }}
+                            {{ $user->verify }}
                         </td>
                     </tr>
                     <tr>

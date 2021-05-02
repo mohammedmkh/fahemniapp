@@ -32,7 +32,7 @@ class UpdateUserRequest extends FormRequest
                 'required',
                 'array',
             ],
-            'verfiy' => [
+            'verify' => [
                 'string',
                 'nullable',
             ],

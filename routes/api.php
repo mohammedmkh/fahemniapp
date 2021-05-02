@@ -1,57 +1,60 @@
 <?php
 
-Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin', 'middleware' => ['auth:sanctum']], function () {
-    // Permissions
-    Route::apiResource('permissions', 'PermissionsApiController');
 
-    // Roles
-    Route::apiResource('roles', 'RolesApiController');
+Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin'], function () {
 
-    // Users
-    Route::apiResource('users', 'UsersApiController');
+    Route::post('validationCode', 'UsersApiController@validationCode');
+    Route::post('login', 'UsersApiController@login');
+    Route::post('validationCodeResetPassword', 'UsersApiController@validationCodeResetPassword');
+    Route::post('checkPhoneResetPassword', 'UsersApiController@checkPhoneResetPassword');
+    Route::post('resetPassword', 'UsersApiController@resetPassword');
 
-    // Countries
-    Route::apiResource('countries', 'CountriesApiController');
 
-    // Levels
-    Route::apiResource('levels', 'LevelsApiController');
+    /************************************************************************************ STUDENT*/
 
-    // Universites
-    Route::apiResource('universites', 'UniversitesApiController');
+    Route::post('registerStudent', 'UsersApiController@registerStudent');
 
-    // Courses
-    Route::apiResource('courses', 'CoursesApiController');
 
-    // Tutors Courses
-    Route::apiResource('tutors-courses', 'TutorsCoursesApiController');
 
-    // Prices
-    Route::apiResource('prices', 'PricesApiController');
 
-    // Wallet
-    Route::apiResource('wallets', 'WalletApiController');
+    /**************************************************************************** TEACHER */
 
-    // Reviews
-    Route::apiResource('reviews', 'ReviewsApiController');
+    Route::post('registerTeacher', 'UsersApiController@registerTeacher');
+    Route::get('getCountries', 'UsersApiController@getCountries');
+    Route::get('getUniversity', 'UsersApiController@getUniversity');
+    Route::get('getLevels', 'UsersApiController@getLevels');
+    Route::get('getCourses', 'UsersApiController@getCourses');
+    Route::get('getCoursesGrades', 'UsersApiController@getCoursesGrades');
 
-    // Vaforite
-    Route::apiResource('vaforites', 'VaforiteApiController');
+});
 
-    // Conversations
-    Route::apiResource('conversations', 'ConversationsApiController');
 
-    // Settings
-    Route::apiResource('settings', 'SettingsApiController');
 
-    // Help
-    Route::apiResource('helps', 'HelpApiController');
+Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin', 'middleware' => ['auth:api']], function () {
 
-    // Booking
-    Route::apiResource('bookings', 'BookingApiController');
+    Route::get('myInfo', 'UsersApiController@myInfo');
+    Route::post('updateProfile', 'UsersApiController@updateProfile');
+    Route::post('updatePassword', 'UsersApiController@updatePassword');
+    Route::get('logout', 'UsersApiController@logout');
 
-    // Devicetokens
-    Route::apiResource('devicetokens', 'DevicetokensApiController');
 
-    // Notifications
-    Route::apiResource('notifications', 'NotificationsApiController');
+    /************************************************************************************ STUDENT*/
+
+    Route::get('getTeachers', 'UsersApiController@getTeachers');
+    Route::get('getBestTeachers', 'UsersApiController@getBestTeachers');
+    Route::post('searchTeacherName', 'UsersApiController@searchTeacherName');
+    Route::post('filterTeachers', 'UsersApiController@filterTeachers');
+    Route::post('setfavoriteForTeacher', 'UsersApiController@setfavoriteForTeacher');
+    Route::post('setConverstionRequestByStudent', 'UsersApiController@setConverstionRequestByStudent');
+    Route::post('updateConverstionRequestByTeacher', 'UsersApiController@updateConverstionRequestByTeacher');
+    Route::post('getConverstionRequestsForTeacher', 'UsersApiController@getConverstionRequestsForTeacher');
+
+
+
+
+    /**************************************************************************** TEACHER */
+
+
+
+
 });

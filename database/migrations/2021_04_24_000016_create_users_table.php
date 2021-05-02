@@ -15,9 +15,13 @@ class CreateUsersTable extends Migration
             $table->datetime('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->string('remember_token')->nullable();
-            $table->string('verfiy')->nullable();
+            $table->string('verify')->nullable();
             $table->string('phone')->nullable();
             $table->string('sex')->nullable();
+            $table->string('sms_code')->nullable();
+            $table->boolean('is_reset')->default(0);
+
+            $table->string('cv')->nullable();
             $table->string('age')->nullable();
             $table->string('lat')->nullable();
             $table->string('long')->nullable();

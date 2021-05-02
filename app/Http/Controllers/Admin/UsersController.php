@@ -62,8 +62,8 @@ class UsersController extends Controller
 
                 return implode(' ', $labels);
             });
-            $table->editColumn('verfiy', function ($row) {
-                return $row->verfiy ? $row->verfiy : '';
+            $table->editColumn('verify', function ($row) {
+                return $row->verify ? $row->verify : '';
             });
             $table->editColumn('phone', function ($row) {
                 return $row->phone ? $row->phone : '';
