@@ -19,8 +19,9 @@
         "laravel/passport": "~9.0",
         "laravel/sanctum": "^2.8",
         "laravel/tinker": "^2.0",
-        "laravel/ui": "^2.0",
-        "yajra/laravel-datatables-oracle": "^9.9"
+        "laravel/ui": "^2.4",
+        "yajra/laravel-datatables-oracle": "^9.9",
+        "yoeunes/toastr": "^1.2"
     },
     "require-dev": {
         "facade/ignition": "^2.0",

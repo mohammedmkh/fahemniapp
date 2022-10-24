@@ -53,7 +53,7 @@ class ReviewsController extends Controller
             });
 
             $table->editColumn('type', function ($row) {
-                return $row->type ? $row->type : '';
+                return $row->type_name ? $row->type_name : '';
             });
             $table->editColumn('review', function ($row) {
                 return $row->review ? $row->review : '';

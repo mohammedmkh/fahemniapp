@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+  <name>Flow shipping</name>
+  <code>Flow_shipping</code>
+  <version>1.0</version>
+  <author>Marvel System</author>
+  <link>https://marvel.com</link>
+  <file path="admin/view/template/sale/order_info.twig">
+    <operation>
+      <search><![CDATA[<a href="{{ invoice }}"]]></search>
+      <add position="before"><![CDATA[
+        {% if shippin_flow_button %}
+            <button type="button" class="btn btn-info" onclick="flowShipping();" id="shippin_flow_button">{{ shipping_flow_button }}</button>
+        {% endif %}
+        {% if shippin_flow_button_show %}
+            <a href="{{ shippin_flow_button_show }}" target="_blank" class="btn btn-info">{{ shipping_flow_show }}</a>
+        {% endif %}
+      ]]></add>
+    </operation>
+       <operation>
+      <search><![CDATA[{{ footer }}]]></search>
+      <add position="before"><![CDATA[
+        <script>
+  function flowShipping() {
+    $.ajax({
+      url: 'index.php?route=extension/shipping/flow/form&user_token={{ user_token }}&order_id={{ order_id }}',
+      type: 'get',
+      dataType: 'html',
+      success: function (html) {
+        $('#shipping_flow_block').html(html);
+
+        $('#shipping_flow_modal').modal('show');
+      }
+    });
+  }
+
+  function createflowShipping() {
+    $.ajax({
+      url: 'index.php?route=extension/shipping/flow/create&user_token={{ user_token }}',
+      type: 'post',
+      data: $('#form-create-shipping').serialize(),
+      dataType: 'json',
+      beforeSend: function () {
+        $('#create_shipping').button('loading');
+      },
+      complete: function () {
+        $('#create_shipping').button('reset');
+      },
+      success: function (json) {
+        $('#form-create-shipping .text-danger').remove();
+        if (json['error']) {
+          $.each(json['error'], function (i, item) {
+            $('#input-' + i).after('<span class="text-danger">' + item + '</span>');
+          });
+        }
+        if(json['warning']) {
+          $('#shipping_flow_block').prepend('<div class="text-danger">' + json['warning'] + '</div>');
+        }
+
+        if (json['success']) {
+          $('#shipping_flow_block').html('<div><p class="text-success text-cente">' + json['success'] + '</p><p class="text-center"><a href="' + json['pdf_label'] + '" target="_blank">{{ shipping_flow_show }}</a></p></div>');
+          
+          $('#shippin_flow_button').before('<a href="' + json['pdf_label'] + '" target="_blank" class="btn btn-info">{{ shipping_flow_show }}</a>');
+          
+          $('#shippin_flow_button').remove();
+          $('#create_shipping').remove();
+          
+          $.ajax({
+            url: '{{ catalog }}index.php?route=api/order/history&api_token={{ api_token }}&store_id={{ store_id }}&order_id={{ order_id }}',
+            type: 'post',
+            dataType: 'json',
+            data: 'order_status_id={{ shipping_flow_shipping_order_status }}&notify=1&override=0&append=0&comment=' + encodeURIComponent(json['comment']),
+            success: function(json) {
+              $('.alert-dismissible').remove();
+
+              if (json['error']) {
+                $('#history').before('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+              }
+
+              if (json['success']) {
+                $('#history').load('index.php?route=sale/order/history&user_token={{ user_token }}&order_id={{ order_id }}');
+
+              }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+              alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+          });
+          
+        }
+      }
+    });
+  }
+
+</script>
+<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="shipping_flow_modal">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">{{ flow_shippin_header }}</h2>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="shipping_flow_block">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-loading-text="{{ text_loading }}" id="create_shipping" onclick="createflowShipping();">{{ shipping_flow_create }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+      ]]></add>
+    </operation>
+  </file>
+    <file path="admin/language/en-gb/sale/order.php">
+    <operation>
+      <search><![CDATA[// Text]]></search>
+      <add position="before"><![CDATA[
+       $_['shipping_flow_button']    = 'flow shipping';
+       $_['flow_shippin_header']     = 'Create flow Shipping';
+       $_['shipping_flow_create']    = 'Create flow Shipping';
+       $_['shipping_flow_show']    = 'Show AWB label';
+      ]]></add>
+    </operation>
+    </file>
+	<file path="admin/language/ar/sale/order.php">
+    <operation>
+      <search><![CDATA[// Text]]></search>
+      <add position="before"><![CDATA[
+       $_['shipping_flow_button']    = 'شحن Flow';
+       $_['flow_shippin_header']     = 'إنشاء بوليصة  Flow';
+       $_['shipping_flow_create']    = 'إنشاء بوليصة  Flow';
+       $_['shipping_flow_show']    = 'عرض البوليصة';
+      ]]></add>
+    </operation>
+    </file>
+     <file path="admin/controller/sale/order.php">
+    <operation>
+      <search><![CDATA[if ($order_status_info) {]]></search>
+      <add position="before"><![CDATA[
+       $data['shipping_flow_shipping_order_status'] = $this->config->get('shipping_flow_shipping_order_status');
+
+            $data['shippin_flow_button'] = false;
+
+            if(in_array($order_info['order_status_id'], $this->config->get('shipping_flow_order_status'))) {
+                $data['shippin_flow_button'] = true;
+            }
+            
+        $data['shippin_flow_button_show'] = false;
+            
+           $shippin_flow_button_show =  $this->model_sale_order->getFlowShipping($order_id);
+           
+           if($shippin_flow_button_show != false) {
+             $data['shippin_flow_button_show'] = $shippin_flow_button_show['link'];
+           }
+      ]]></add>
+    </operation>
+    </file>
+      <file path="admin/model/sale/order.php">
+    <operation>
+      <search><![CDATA[public function getOrderTotals($order_id) {]]></search>
+      <add position="before"><![CDATA[
+       public function getFlowShipping($order_id) {
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_flow WHERE order_id = '" . (int)$order_id . "'");
+
+        if($query->num_rows) {
+            return $query->row;
+        }
+
+        return false;
+    }
+
+	public function saveFlowShipping($order_id, $link) {
+
+	    if($this->getFlowShipping($order_id) == false) {
+            $this->db->query("INSERT INTO " . DB_PREFIX . "order_flow SET order_id = '" . (int)$order_id . "', link = '" . $this->db->escape($link) . "'");
+        }
+	    else {
+            $this->db->query("UPDATE " . DB_PREFIX . "order_flow SET link = '" . $this->db->escape($link) . "' WHERE order_id = '" . (int)$order_id . "'");
+        }
+	}
+      ]]></add>
+    </operation>
+    </file>
+</modification>

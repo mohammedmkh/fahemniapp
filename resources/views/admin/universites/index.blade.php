@@ -89,7 +89,15 @@
 @parent
 <script>
     $(function () {
-  let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
+  let dtButtons = [
+      'print',
+      'copyHtml5',
+      'excelHtml5',
+      'csvHtml5',
+      'pdfHtml5',
+  ]
+
+       // console.log(' the arr buttons is ' +dtButtons);
 @can('universite_delete')
   let deleteButtonTrans = '{{ trans('global.datatables.delete') }}'
   let deleteButton = {
@@ -123,14 +131,67 @@
   $.extend(true, $.fn.dataTable.defaults, {
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
-    pageLength: 100,
+    pageLength: 100
+    @if(session()->get('language') == 'ar')
+    ,
+    language :{
+        url:"//cdn.datatables.net/plug-ins/1.10.25/i18n/Arabic.json",
+        processing: "<img src='{{url('loading.gif')}}' id='processingloading'>",
+    }
+    @endif
   });
-  let table = $('.datatable-Universite:not(.ajaxTable)').DataTable({ buttons: dtButtons })
+
+  /*
+  let table = $('.datatable-Universite:not(.ajaxTable)')
+      .DataTable(
+          { buttons: dtButtons }
+      );
+
+
+   */
+
+
+        var table = $('.datatable-Universite').DataTable({
+
+
+
+            dom: 'Blfrtip',
+
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "الكل"]],
+
+            buttons: [
+                {
+                    extend: 'excelHtml5',
+                    exportOptions: {
+                        modifier : {
+                            order : 'index', // 'current', 'applied','index', 'original'
+                            page : 'all', // 'all', 'current'
+                            search : 'none' // 'none', 'applied', 'removed'
+                        },
+                        columns: [ 0, 1,2 ,3]
+                    }
+                }
+
+            ]
+
+
+
+            @if(session()->get('locale') == 'arabic')
+            ,
+            language :{
+                url:"//cdn.datatables.net/plug-ins/1.10.25/i18n/Arabic.json",
+            }
+            @endif
+        });
+
+
+
+
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
-  
+
 })
 
 </script>

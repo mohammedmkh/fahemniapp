@@ -23,7 +23,7 @@ class Notification extends Model
         'action_type',
         'actionid',
         'action',
-        'reed',
+        'is_read',
         'created_at',
         'updated_at',
         'deleted_at',

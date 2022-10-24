@@ -12,7 +12,7 @@
             @csrf
             <div class="form-group">
                 <label for="user_id">{{ trans('cruds.booking.fields.user') }}</label>
-                <select class="form-control select2 {{ $errors->has('user') ? 'is-invalid' : '' }}" name="user_id" id="user_id">
+                <select class="form-control  {{ $errors->has('user') ? 'is-invalid' : '' }}" name="user_id" id="user_id" disabled>
                     @foreach($users as $id => $entry)
                         <option value="{{ $id }}" {{ (old('user_id') ? old('user_id') : $booking->user->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                     @endforeach
@@ -26,7 +26,7 @@
             </div>
             <div class="form-group">
                 <label for="tutor_id">{{ trans('cruds.booking.fields.tutor') }}</label>
-                <select class="form-control select2 {{ $errors->has('tutor') ? 'is-invalid' : '' }}" name="tutor_id" id="tutor_id">
+                <select class="form-control select2 {{ $errors->has('tutor') ? 'is-invalid' : '' }}" name="tutor_id" id="kt_select2_2">
                     @foreach($tutors as $id => $entry)
                         <option value="{{ $id }}" {{ (old('tutor_id') ? old('tutor_id') : $booking->tutor->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                     @endforeach
@@ -38,6 +38,22 @@
                 @endif
                 <span class="help-block">{{ trans('cruds.booking.fields.tutor_helper') }}</span>
             </div>
+
+
+            <div class="form-group">
+                <label for="time_id">حزمة وقت المعلم</label>
+
+                <select class="form-control" name="time_id" id="time_id">
+                    @if(isset($booking->tutor->times ))
+                         @foreach($booking->tutor->times as $time)
+                            <option value="{{$time->id}}" {{ $time->id == $booking->time_id ? 'selected': '' }}>{{$time->time->time}}</option>
+                         @endforeach
+                    @endif
+                </select>
+
+            </div>
+
+
             <div class="form-group">
                 <label for="date">{{ trans('cruds.booking.fields.date') }}</label>
                 <input class="form-control date {{ $errors->has('date') ? 'is-invalid' : '' }}" type="text" name="date" id="date" value="{{ old('date', $booking->date) }}">
@@ -48,41 +64,31 @@
                 @endif
                 <span class="help-block">{{ trans('cruds.booking.fields.date_helper') }}</span>
             </div>
-            <div class="form-group">
-                <label for="time">{{ trans('cruds.booking.fields.time') }}</label>
-                <input class="form-control timepicker {{ $errors->has('time') ? 'is-invalid' : '' }}" type="text" name="time" id="time" value="{{ old('time', $booking->time) }}">
-                @if($errors->has('time'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('time') }}
-                    </div>
-                @endif
-                <span class="help-block">{{ trans('cruds.booking.fields.time_helper') }}</span>
-            </div>
+
             <div class="form-group">
                 <label for="payed">{{ trans('cruds.booking.fields.payed') }}</label>
-                <input class="form-control {{ $errors->has('payed') ? 'is-invalid' : '' }}" type="number" name="payed" id="payed" value="{{ old('payed', $booking->payed) }}" step="1">
-                @if($errors->has('payed'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('payed') }}
-                    </div>
-                @endif
+                <select name="payed" class="form-control">
+
+                        <option value="1" {{$booking->payed == 1 ?'selected' : '' }}> مدفوع</option>
+                        <option value="0" {{$booking->payed != 1 ?'selected' : '' }}> غير مدفوع</option>
+                </select>
                 <span class="help-block">{{ trans('cruds.booking.fields.payed_helper') }}</span>
             </div>
             <div class="form-group">
                 <label for="status">{{ trans('cruds.booking.fields.status') }}</label>
-                <input class="form-control {{ $errors->has('status') ? 'is-invalid' : '' }}" type="text" name="status" id="status" value="{{ old('status', $booking->status) }}">
-                @if($errors->has('status'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('status') }}
-                    </div>
-                @endif
-                <span class="help-block">{{ trans('cruds.booking.fields.status_helper') }}</span>
+
+                <select name="status" class="form-control">
+                      @foreach($booking_statuses as $status)
+                    <option value="{{$status->id}}" {{$booking->status == $status->id ?'selected' : '' }}> {{$status->status_name}}</option>
+                        @endforeach
+                </select>
+
             </div>
             <div class="form-group">
                 <label for="price_id">{{ trans('cruds.booking.fields.price') }}</label>
-                <select class="form-control select2 {{ $errors->has('price') ? 'is-invalid' : '' }}" name="price_id" id="price_id">
-                    @foreach($prices as $id => $entry)
-                        <option value="{{ $id }}" {{ (old('price_id') ? old('price_id') : $booking->price->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
+                <select class="form-control  {{ $errors->has('price') ? 'is-invalid' : '' }}" name="price_id" id="price_id">
+                    @foreach($prices as $price)
+                        <option value="{{ $price->id }}" {{ (old('price_id') ? old('price_id') : $booking->price_id ?? '') == $price->id ? 'selected' : '' }}>{{ $price->name }}</option>
                     @endforeach
                 </select>
                 @if($errors->has('price'))
@@ -114,3 +120,52 @@
 
 
 @endsection
+
+    @section('scripts')
+        <script type="text/javascript">
+
+                $('#kt_select2_2').change(function(){
+                    var tid = $('#kt_select2_2').val();
+                    if(tid) {
+
+
+                        $.ajax({
+                            type: 'GET',
+                            url: '{{url('/getTimes')}}/'+tid,
+                            data: '_token = {{csrf_token()}}',
+                            success: function (data) {
+                                $('#time_id').empty();
+                                $.each(data, function (k, v) {
+                                    $('#time_id').append(
+                                        '<option value="' + v.id + '">' + v.time.time + '</ooption>'
+                                    );
+                                });
+                            }
+                        });
+                    }
+
+                    });
+                        /*
+                        $.ajax({
+                            type:"GET",
+                            url:"{{url('/getTimes')}}/"+tid,
+                            success:function(res) {
+                                $('#time_id').empty();
+                                $.each( res, function(k, v) {
+                                    $('#time_id').append(
+                                        '<option value="'+v.id+'">'+v.name+'</ooption>'
+                                    );
+                                });
+
+                            }
+                 }
+                        })*/
+
+
+
+
+
+
+        </script>
+
+    @endsection

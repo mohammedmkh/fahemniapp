@@ -135,7 +135,14 @@
   $.extend(true, $.fn.dataTable.defaults, {
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
-    pageLength: 100,
+    pageLength: 100
+    @if(session()->get('language') == 'ar')
+    ,
+    language :{
+        url:"//cdn.datatables.net/plug-ins/1.10.25/i18n/Arabic.json",
+        processing: "<img src='{{url('loading.gif')}}' id='processingloading'>",
+    }
+    @endif
   });
   let table = $('.datatable-Help:not(.ajaxTable)').DataTable({ buttons: dtButtons })
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){

@@ -29,6 +29,24 @@
                 @endif
                 <span class="help-block">{{ trans('cruds.course.fields.name_en_helper') }}</span>
             </div>
+
+            <div class="form-group">
+                <label class="required" for="name_en">كود المادة</label>
+                <input class="form-control {{ $errors->has('name_en') ? 'is-invalid' : '' }}" type="text" name="code" id="code" value="{{ old('code', '') }}" >
+            </div>
+
+
+
+            <div class="form-check " style="margin: 30px 0px">
+                <label class="required" for="name_en"> تابع لمادة</label>
+                <select class="form-control" name="parent">
+                    <option value="0"> مادة رئيسية</option>
+                    @foreach($courses as $course)
+                        <option value="{{$course->id}}">  {{$course->name}}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="form-group">
                 <button class="btn btn-danger" type="submit">
                     {{ trans('global.save') }}

@@ -7,6 +7,7 @@ use App\Http\Requests\MassDestroyUniversiteRequest;
 use App\Http\Requests\StoreUniversiteRequest;
 use App\Http\Requests\UpdateUniversiteRequest;
 use App\Universite;
+use App\User;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +16,7 @@ class UniversitesController extends Controller
 {
     public function index()
     {
-        abort_if(Gate::denies('universite_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+       // abort_if(Gate::denies('universite_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $universites = Universite::all();
 
@@ -59,11 +60,18 @@ class UniversitesController extends Controller
 
     public function destroy(Universite $universite)
     {
-        abort_if(Gate::denies('universite_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $is_exist_user_has_this_universite = User::where('university_id' ,$universite->id )->first();
+        if( $is_exist_user_has_this_universite ){
+            $message= 'api.cant_delete';
+            toastr()->error( __( $message) );
+            return back();
+        }
         $universite->delete();
-
+        $message= 'api.delete_successfully';
+        toastr()->success( __( $message) );
         return back();
+
     }
 
     public function massDestroy(MassDestroyUniversiteRequest $request)

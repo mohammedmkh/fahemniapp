@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Booking;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyPriceRequest;
 use App\Http\Requests\StorePriceRequest;
@@ -59,8 +60,16 @@ class PricesController extends Controller
 
     public function destroy(Price $price)
     {
-        abort_if(Gate::denies('price_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $is_exist =  Booking::where('price_id' , $price->id)->first();
+        if(  $is_exist ){
+            $message= 'api.cant_delete';
+            toastr()->error( __( $message) );
+            return back();
+        }
+
+        $message= 'api.delete_successfully';
+        toastr()->success( __( $message) );
         $price->delete();
 
         return back();

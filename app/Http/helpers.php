@@ -1,9 +1,20 @@
 <?php
 
 
-
+ // hello new world
 use App\User;
 use Illuminate\Support\Facades\Cache;
+
+function getFullUser($id){
+    $user = User::find($id);
+
+    if($user->role == 3){
+        $user = User::with('country','city' , 'level' , 'university' ,'TutorsCourses.course' ,'times.time','quta.price')->where('id' ,$id)->first();
+        return $user ;
+    }
+    $user = User::with('country' ,'city', 'level' , 'university')->where('id' ,$id)->first();
+    return $user ;
+}
 
 
 function  alertSuccessUpdate($message = null , $title = null){
@@ -26,6 +37,7 @@ function  alertSuccessUpdate($message = null , $title = null){
 
 function  alertSuccessAdd($message = null , $title = null){
 
+     $note = '' ;
 
     if(session()->get('language') == 'en'){
         $message = ' The Add Item Success created ' ;
@@ -56,120 +68,87 @@ function getFirstMessageError($validator){
     }
 }
 
-function getDataFromRequest($type = 'user_tech' , $request = []){
 
 
-    if($type == 'user_tech'){
-        $d['phone'] = $request->phone;
-        $d['tech_store_email'] = $request->email;
-        $d['min_order_value'] = $request->min_order_value;
-        $d['tech_store_email'] = $request->email;
-        $d['priority'] = $request->priority;
-        $d['app_benifit_percentage'] = $request->app_benifit_percentage;
-        if($request->hour_work != '')
-            $d['hour_work'] = $request->hour_work;
-
-        if(! $request->have_vehicle){
-            $d['have_vehicle'] = 0;
-        }else{
-            $d['have_vehicle'] = $request->have_vehicle;
-        }
-        if( $request->type_vehicle != ''){
-            $d['type_vehicle'] = $request->type_vehicle;
-        }
-
-        $d['type'] = 1 ;   //  1 mean is technician
-        $d['services'] = json_encode($request->categories) ;
-
-        if($request->work_time_from != ''){
-            $d['work_time_from'] = $request->work_time_from ;
-        }
-        if($request->work_time_to != ''){
-            $d['work_time_to'] = $request->work_time_to ;
-        }
+function sendSMSOld( $phone, $message ){
 
 
-
-        return $d ;
-    }
-    if($type == 'user_tech_store'){
-        $d['bank_name'] = $request->bank_name;
-        $d['bank_account'] = $request->bank_account;
-        $d['owner_account'] = $request->owner_account;
-        $d['phone'] = $request->phone;
-        $d['tech_store_email'] = $request->email;
-        $d['min_order_value'] = $request->order_min;
-        $d['tech_store_email'] = $request->email;
-        $d['priority'] = $request->priority;
-        $d['driver_radius']=$request->driver_radius;
-        $d['app_benifit_percentage'] = $request->app_benifit_percentage;
-        if($request->hour_work != '')
-            $d['hour_work'] = $request->hour_work;
-
-        if( $request->vehicle_type != ''){
-            $d['type_vehicle'] = $request->vehicle_type;
-        }
-
-        $d['type'] = 2 ;   //  1 mean is technician
-        $d['services'] = json_encode($request->categories) ;
-
-        if($request->work_time_from != ''){
-            $d['work_time_from'] = $request->work_time_from ;
-        }
-        if($request->work_time_to != ''){
-            $d['work_time_to'] = $request->work_time_to ;
-        }
+    $pin_country = '+966' ;
+    $phone = $pin_country . substr($phone, 1);
 
 
+    $username = 'awesfaheem';
+    $password = 'Fah$$m@123';
+    $yourMobile=$phone;
+    $messages = array(
+        array('to'=>$yourMobile, 'body'=>$message),
+    );
 
-        return $d ;
-    }
+    $result = send_message( json_encode($messages), 'https://api.bulksms.com/v1/messages', $username, $password );
+
+    // dd( $result);
+    return ;
+
 
 
 }
 
 
-
 function sendSMS( $phone, $message ){
 
 
+    $curl = curl_init();
+    $phone =substr($phone, 1);
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => "https://msegat.com/gw/",
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => "",
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 30,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => "POST",
+        CURLOPT_POSTFIELDS => "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"userName\"\r\n\r\nfahemniapp\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"apiKey\"\r\n\r\n4752fc70143ce170e7cf8a2aa2c9e46f\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"numbers\"\r\n\r\n966".$phone."\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"userSender\"\r\n\r\nOTP\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"msg\"\r\n\r\n".$message." \r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"By\"\r\n\r\nLink\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--",
+        CURLOPT_HTTPHEADER => array(
+            "cache-control: no-cache",
+            "content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
+            "postman-token: 79d2304a-e79c-9dcb-7714-882b4fcdfcfa"
+        ),
+    ));
 
-    // $phone =substr($phone, 1);
+    $response = curl_exec($curl);
+    $err = curl_error($curl);
 
-    $data = [
-        "Username"=> "0555096656",
-        "Password"=> "Edah2020",
-        "Tagname" => "Edahcompany",
-        "RecepientNumber" =>  $phone,
-        "ReplacementList"=> "",
-        "Message"=>$message,
-        "SendDateTime"=> 0,
-        "EnableDR"=> false
-    ];
-    $data = json_encode($data);
-    $url = "http://api.yamamah.com/SendSMS" ;
-    $ch = curl_init( $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1 );
-    curl_setopt($ch, CURLOPT_POST,           1 );
-    curl_setopt($ch, CURLOPT_POSTFIELDS,     $data );
-    curl_setopt($ch, CURLOPT_HTTPHEADER,     array('Content-Type: application/json'));
-
-
-
-
-    $response = curl_exec($ch);
-    $err = curl_error($ch);
-
-
-
-    curl_close($ch);
+    // dd($response , $message );
+    curl_close($curl);
 
 
 
 
+}
 
 
-
+function send_message ( $post_body, $url, $username, $password) {
+    $ch = curl_init( );
+    $headers = array(
+        'Content-Type:application/json',
+        'Authorization:Basic '. base64_encode("$username:$password")
+    );
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt ( $ch, CURLOPT_URL, $url );
+    curl_setopt ( $ch, CURLOPT_POST, 1 );
+    curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
+    curl_setopt ( $ch, CURLOPT_POSTFIELDS, $post_body );
+    // Allow cUrl functions 20 seconds to execute
+    curl_setopt ( $ch, CURLOPT_TIMEOUT, 20 );
+    // Wait 10 seconds while trying to connect
+    curl_setopt ( $ch, CURLOPT_CONNECTTIMEOUT, 10 );
+    $output = array();
+    $output['server_response'] = curl_exec( $ch );
+    $curl_info = curl_getinfo( $ch );
+    $output['http_status'] = $curl_info[ 'http_code' ];
+    $output['error'] = curl_error($ch);
+    curl_close( $ch );
+    return $output;
 }
 
 
@@ -178,67 +157,88 @@ function sendFCM($title, $body, $data, $tokens, $badge)
 {
 
 
-    $notif = new  \App\Notifications ;
+    $notif = new  \App\Notification ;
     $notif->user_id =  $data['user_id'];
     $notif->action_type =$data['action_type']  ;
     $notif->action_id  = $data['action_id'] ;
     $notif-> title = $data['title'] ;
     $notif-> body = $data['body']  ;
     $notif-> is_read = 0 ;
-    $notif-> action = json_encode($data['action'] )  ;
     $date = Carbon\Carbon::now()->toDateTimeString();
     if($date){
-        $notif-> date =   $date;
+        $notif-> date = $date;
         $notif->save();
     }
     $notif->save();
 
+
     if(isset($tokens) && $tokens != null){
-        $tokens =  $tokens->device_token ;
+        if( !$tokens->device_token | $tokens->is_notify == 0){
+            return ;
+        }
+        $token[] =  $tokens->device_token ;
+        $device = $tokens->device_type ;
+
     }else{
         return ;
     }
 
 
+     //dd($tokens);
+
 
     $user = User::where('id' , $notif->user_id)->first() ;
     if($user){
 
-        $count_unread=\App\Notifications::where('user_id' , $data['user_id'] )->where('is_read' , 0 )->count();
+        $count_unread = \App\Notification::where('user_id' , $data['user_id'] )->where('is_read' , 0 )->count();
 
 
         $newData['action_type'] = $data['action_type'] ;
         $newData['action_id'] = $data['action_id'] ;
         $newData['date'] = $data['date'] ;
-        $newData['action'] = $data['action'] ;
 
-        $optionBuilder = new \LaravelFCM\Message\OptionsBuilder();
-        $optionBuilder->setTimeToLive(60*20);
-
-
-        $notificationBuilder = new \LaravelFCM\Message\PayloadNotificationBuilder($title);
-        $notificationBuilder->setBody($body)
-            ->setSound('default')
-            ->setBadge($count_unread);
-
-        $dataBuilder = new \LaravelFCM\Message\PayloadDataBuilder();
-        $dataBuilder->addData(['data' => (object) $newData ]);
-
-        $option = $optionBuilder->build();
-        $notification = $notificationBuilder->build();
-        $data = $dataBuilder->build();
-
-        $downstreamResponse = \LaravelFCM\Facades\FCM::sendTo($tokens, $option, $notification, $data);
-
-        // return Array (key:token, value:error) - in production you should remove from your database the tokens
-        $object = [
-            'numberSuccess' => $downstreamResponse->numberSuccess(),
-            'numberFailure' => $downstreamResponse->numberFailure(),
-            'numberModification' => $downstreamResponse->numberModification(),
+        $msg = [
+            'action_id' => $data['action_id'],
+            'action_type' =>$data['action_type'],
+            'date' => $data['date'] ,
+            'title' => $title,
+            'body' => $body,
+            'icon' => 'myicon',
+            'sound' => 'mySound',
+            'badge' => 1
         ];
 
+        if ($device == 'ios' | $device == 'IOS'  ) {
 
-        return $object;
+            $fields = [
+                'registration_ids' => $token,
+                'notification' => $msg
+            ];
+
+        } else {
+            $fields = [
+                'registration_ids' => $token,
+                'data' => $msg,
+            ];
+        }
+
+        // dd( json_encode($fields));
+        $headers = [
+            'Authorization:key=' . 'AAAAl2PmUUQ:APA91bGx-JTi90lYcYNDU25MSRBxwPxrnH1Vk_NwBpfk6i0l2Q31eULv7IOTpKYtof5BUeacCvVidb9kQVx3UXDsZmCKovMCX7ozuhAxBB3vY4t771N7oa_fvt0AlZOrRxRREMgDph8w',
+            'Content-Type: application/json'
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($fields));
+        $result = curl_exec($ch);
+        curl_close($ch);
+        // dd($result , $fields);
+        return $result;
     }
 
 }
@@ -283,21 +283,9 @@ function uploadFile($file, $width=500, $dest=null)
     $final = $dest.'/'.$name;
     $file->move( $dest, $name);
 
-
-    /*
-    $image_new = Image::make(public_path('images/upload/').'/'.$name) ;
-    $image_new->resize($width, null, function ($constraint) {
-        $constraint->aspectRatio();
-    });
-    $image_new ->save();
-    */
-
-    //dd($name2);
-
-
-
     return   $final;
 }
+
 
 
 function jsonResponse($status, $message, $data=null, $code=null, $page= null , $page_count=null ,$validator=null)

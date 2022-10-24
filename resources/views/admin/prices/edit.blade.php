@@ -12,13 +12,11 @@
             @csrf
             <div class="form-group">
                 <label class="required" for="num_std">{{ trans('cruds.price.fields.num_std') }}</label>
-                <input class="form-control {{ $errors->has('num_std') ? 'is-invalid' : '' }}" type="text" name="num_std" id="num_std" value="{{ old('num_std', $price->num_std) }}" required>
-                @if($errors->has('num_std'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('num_std') }}
-                    </div>
-                @endif
-                <span class="help-block">{{ trans('cruds.price.fields.num_std_helper') }}</span>
+                <select class="form-control"  name="num_std" id="num_std" >
+                    <option value="1" {{( $price->num_std == 1 )?'selected':'' }}>  طالب واحد</option>
+                    <option value="2" {{( $price->num_std == 2 )?'selected':'' }}>طالبين </option>
+                    <option value="3" {{( $price->num_std == 3 )?'selected':'' }}>ثلاث طلاب</option>
+                </select>
             </div>
             <div class="form-group">
                 <label class="required" for="hours">{{ trans('cruds.price.fields.hours') }}</label>
@@ -39,6 +37,17 @@
                     </div>
                 @endif
                 <span class="help-block">{{ trans('cruds.price.fields.price_helper') }}</span>
+            </div>
+
+            <div class="form-group">
+                <label class="required" for="price">{{ trans('cruds.price.fields.commission') }}</label>
+                <input class="form-control {{ $errors->has('commission') ? 'is-invalid' : '' }}" type="text" name="commission" id="commission" value="{{ old('commission', $price->commission) }}" required>
+                @if($errors->has('commission'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('commission') }}
+                    </div>
+                @endif
+
             </div>
             <div class="form-group">
                 <button class="btn btn-danger" type="submit">

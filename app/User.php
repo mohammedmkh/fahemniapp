@@ -32,32 +32,175 @@ class User extends Authenticatable
         'deleted_at',
     ];
 
-    protected $appends = ['reviewedRating', 'IsFavorite'];
+    protected $casts = [
+        'role' => 'integer', 'country_id'=>'integer' , 'level_id' => 'integer'
+        , 'university_id' => 'integer' ,'sms_code'=> 'string'
+    ];
+    protected $appends = ['reviewedRating', 'IsFavorite' , 'role_name' , 'cv_path' , 'grades_doc_path' ,
+        'image_path' , 'sex_name' ,'age' , 'best_course' , 'verify_name' , 'status_name'
+        ,'count_booking' ,'count_booking_finish', 'is_complete_bank_account'];
 
     protected $fillable = [
         'name',
+        'role' ,
         'email',
         'email_verified_at',
         'password',
         'remember_token',
+        'status',
         'verify',
         'phone',
         'sex',
-        'age',
         'country_id',
+        'city_id',
         'lat',
         'long',
         'level_id',
         'university_id',
         'bio',
+        'cv',
+        'grades_doc',
+        'birthday',
         'created_at',
         'updated_at',
         'deleted_at',
+        'bank_name' ,
+        'bank_user_name' ,
+        'bank_account' ,
+        'bank_iban'
     ];
+
+
+    public function getBioAttribute($value)
+    {
+        //return 'Man';
+        if($value == null || $value == ''){
+            return '' ;
+        }
+        return $value ;
+    }
+
+    public function getBestCourseAttribute()
+    {
+        if( $this->TutorsCourses != ''){
+            return $this->TutorsCourses[0]->course->name ?? '' ;
+        }else{
+            return null;
+        }
+      //  return $user ;
+    }
+
+
+    public function getStatusNameAttribute()
+    {
+        if($this->status == 0){
+            return __('api.not_verify') ;
+        }
+        if($this->status == 2){
+            return __('api.rejected') ;
+        }
+        return __('api.verify') ;
+    }
+
+
+    public function getVerifyNameAttribute()
+    {
+        if($this->verify == 0){
+            return __('api.not_verify') ;
+        }
+
+        return __('api.verify') ;
+    }
+    public function getSexNameAttribute()
+    {
+        if($this->sex == 0){
+            return __('api.female') ;
+        }
+
+        return __('api.male') ;
+    }
+
+    public function getCountBookingAttribute(){
+
+        $bookings = Booking::where('tutor_id' , $this->id)->where('status', 4)->count();
+
+        return $bookings ;
+    }
+
+    public function getCountBookingFinishAttribute(){
+
+        $bookings = Booking::where('tutor_id' , $this->id)->where('is_posting' , 0)->where('status', 4)->count();
+
+        return $bookings ;
+    }
+
+
+    public function getAgeAttribute(){
+        if($this->birthday != ''){
+            $age =   \Carbon\Carbon::parse($this->birthday)->diff(\Carbon\Carbon::now())->format('%y years');
+          return $age;
+        }
+        return '20 years';
+       // return $item;
+    }
+
+    public function getIsCompleteBankAccountAttribute(){
+        if($this->bank_name != ''){
+          return 1 ;
+        }
+        return 0;
+        // return $item;
+    }
+
+
+
+    public function getCvPathAttribute()
+    {
+        if($this->cv != ''){
+            return url('/').'/'.$this->cv ;
+        }
+        return '';
+
+    }
+
+    public function getGradesDocPathAttribute()
+    {
+        if($this->grades_doc != ''){
+            return url('/').'/'.$this->grades_doc ;
+        }
+        return '';
+
+    }
+
+    public function getImagePathAttribute()
+    {
+        if($this->image != ''){
+            return url('/').'/'.$this->image ;
+        }
+
+        if($this->sex == 0 )
+            return url('/').'/female.png';
+
+        return url('/').'/user.jpeg';
+       // return __('api.teacher') ;
+    }
+
+    public function getRoleNameAttribute()
+    {
+       if($this->role == 2){
+           return __('api.student') ;
+       }
+       return __('api.teacher') ;
+    }
 
     public function getIsAdminAttribute()
     {
         return $this->roles()->where('id', 1)->exists();
+    }
+
+    public function TutorsCourses()
+    {
+        return $this->hasMany(TutorsCourse::class, 'user_id', 'id');
     }
 
     public function userTutorsCourses()
@@ -87,6 +230,8 @@ class User extends Authenticatable
         $this->notify(new ResetPassword($token));
     }
 
+
+
     public function roles()
     {
         return $this->belongsToMany(Role::class);
@@ -95,6 +240,11 @@ class User extends Authenticatable
     public function country()
     {
         return $this->belongsTo(Country::class, 'country_id');
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class, 'city_id');
     }
 
     public function level()
@@ -126,9 +276,32 @@ class User extends Authenticatable
 
     }
 
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'tutor_id');
+
+    }
+
+    public function userHealthy()
+    {
+        return $this->hasMany(Userhealthy::class, 'user_id');
+
+    }
     public function reviewed()
     {
         return $this->hasMany(Review::class, 'reviewed_id');
+
+    }
+
+    public function times()
+    {
+        return $this->hasMany(TutorTimes::class, 'user_id')->where('display' ,1);
+
+    }
+
+    public function quta()
+    {
+        return $this->hasMany(TutorQuta::class, 'user_id')->where('display' ,1);;
 
     }
 
@@ -138,14 +311,17 @@ class User extends Authenticatable
 
     }
 
+
+
+
     public function getReviewedRatingAttribute()
     {
-        return $this->reviewed()->avg('review') ?: 0;
+        return (double)$this->reviewed()->avg('review') ?: 0;
     }
 
     public function getIsFavoriteAttribute()
     {
-        if(!Auth::check()){
+        if(!Auth::guard('api')->id()){
             return 0 ;
 
         }

@@ -30,42 +30,13 @@
                     <th>
                         {{ trans('cruds.user.fields.email') }}
                     </th>
-                    <th>
-                        {{ trans('cruds.user.fields.email_verified_at') }}
-                    </th>
+
                     <th>
                         {{ trans('cruds.user.fields.roles') }}
                     </th>
-                    <th>
-                        {{ trans('cruds.user.fields.verify') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.user.fields.phone') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.user.fields.sex') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.user.fields.age') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.user.fields.country') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.user.fields.lat') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.user.fields.long') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.user.fields.level') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.user.fields.university') }}
-                    </th>
-                    <th>
-                        {{ trans('cruds.user.fields.bio') }}
-                    </th>
+
+
+
                     <th>
                         &nbsp;
                     </th>
@@ -125,23 +96,22 @@
 { data: 'id', name: 'id' },
 { data: 'name', name: 'name' },
 { data: 'email', name: 'email' },
-{ data: 'email_verified_at', name: 'email_verified_at' },
+
 { data: 'roles', name: 'roles.title' },
-{ data: 'verify', name: 'verify' },
-{ data: 'phone', name: 'phone' },
-{ data: 'sex', name: 'sex' },
-{ data: 'age', name: 'age' },
-{ data: 'country_name_ar', name: 'country.name_ar' },
-{ data: 'lat', name: 'lat' },
-{ data: 'long', name: 'long' },
-{ data: 'level_name_ar', name: 'level.name_ar' },
-{ data: 'university_name_en', name: 'university.name_en' },
-{ data: 'bio', name: 'bio' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+
+
+{ data: 'actions', name: '{{ trans('global.actions') }}' ,searchable:false , sortable:false }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
-    pageLength: 100,
+    pageLength: 100
+                    @if(session()->get('language') == 'ar')
+                ,
+                language :{
+                    url:"//cdn.datatables.net/plug-ins/1.10.25/i18n/Arabic.json",
+                    processing: "<img src='{{url('loading.gif')}}' id='processingloading'>",
+                }
+                    @endif
   };
   let table = $('.datatable-User').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){

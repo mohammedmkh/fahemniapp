@@ -1,0 +1,169 @@
+<form id="form-create-shipping" class="form-horizontal">
+
+
+
+
+    <div class="container-fluid">
+        <div class="row">
+            <div id="shipping_flow_block_warning"></div>
+            <div class="col-lg-6 col-md-6 col-sm-12">
+                <div class="row">
+                    <legend>معلومات العميل</legend>
+
+
+
+
+
+                    <div class="form-group required">
+                        <label class="col-sm-3 control-label" for="input-delivery_name">{{ entry_delivery_name }}</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="delivery_name" value="{{ customer_name }}" placeholder="{{ entry_delivery_name }}" id="input-delivery_name" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group required">
+                        <label class="col-sm-3 control-label" for="input-delivery_address">{{ entry_delivery_address }}</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="delivery_address" value="{{ customer_address }}" placeholder="{{ entry_delivery_address }}" id="input-delivery_address" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="input-delivery_region">{{ entry_delivery_region }}</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="delivery_region" value="{{ customer_region }}" placeholder="{{ entry_delivery_region }}" id="input-delivery_region" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="input-delivery_postcode">City</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="delivery_postcode" value="{{ customer_postcode }}" placeholder="jeddah" id="input-delivery_postcode" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group required">
+                        <label class="col-sm-3 control-label" for="input-delivery_telephone">{{ entry_delivery_telephone }}</label>
+                        <div class="col-sm-9">
+                            <input type="tel" name="delivery_phone" value="{{ customer_telephone }}" placeholder="{{ entry_delivery_telephone }}" id="input-delivery_telephone" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group required">
+                        <div class="col-sm-9">
+                            <input type="hidden" name="delivery_city" id="input-delivery_city" value="{{ customer_region }}">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12">
+                <legend>معلومات الشحن</legend>
+                <div class="form-group required">
+                    <label class="col-sm-3 control-label" for="input-reference">Reference Request No.</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="reference" value="{{ reference }}" placeholder="Reference" id="input-reference" class="form-control">
+                    </div>
+                </div>
+
+
+                <div class="form-group required">
+                    <label class="col-sm-3 control-label" for="input-reference"> Shipment Type Products </label>
+                    <div class="col-sm-9">
+                        <input type="text" name="commodity-value" value="" placeholder="Laptop , Mobile" id="input-commodity-value" class="form-control">
+                    </div>
+                </div>
+
+
+
+                <div class="form-group ">
+                    <label class="col-sm-3 control-label" for="input-packageWeight">وزن الباكج</label>
+                    <div class="col-sm-9">
+                        <input type="number" name="packageWeight" placeholder="وزن الباكج" id="input-packageWeight" class="form-control ">
+                    </div>
+                </div>
+
+                <div class="form-group ">
+                    <label class="col-sm-3 control-label" for="input-packageVolume">حجم الباكج</label>
+                    <div class="col-sm-9">
+                        <input type="number" name="packageVolume" placeholder="حجم الباكج" id="input-packageVolume" class="form-control not-required">
+                    </div>
+                </div>
+
+
+
+
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="input-is_cod"><span data-toggle="tooltip" title="{{ help_is_cod }}">{{ entry_is_cod }}</span></label>
+                    <div class="col-sm-9">
+                        <select name="is_cod" id="input-is_cod" class="form-control">
+                            {% if is_cod %}
+                                <option value="1" selected="selected">{{ text_yes }}</option>
+                                <option value="0">{{ text_no }}</option>
+                            {% else %}
+                                <option value="1">{{ text_yes }}</option>
+                                <option value="0" selected="selected">{{ text_no }}</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group required" id="cod_amount_row">
+                    <label class="col-sm-3 control-label" for="input-cod_amount"><span data-toggle="tooltip" title="" data-original-title="If order is COD, then COD amount is the amount Flow driver will be collecting from your customer">COD amount</span></label>
+                    <div class="col-sm-9">
+                        <input type="text" name="cod_amount" value="" placeholder="COD amount" id="input-cod_amount" class="form-control">
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="input-is_cod"><span data-toggle="tooltip" title="is Has Product most be careful when charge it">is risk surcharge applicable</span></label>
+                    <div class="col-sm-9">
+                        <select name="is_risk_surcharge_applicable" id="input-is_risk_surcharge_applicable" class="form-control">
+
+                            <option value="true" selected="selected">{{ text_yes }}</option>
+                            <option value="false">{{ text_no }}</option>
+
+                        </select>
+                    </div>
+                </div>
+
+
+
+
+
+                <div class="form-group required">
+                    <label class="col-sm-3 control-label" for="input-items_count"><span data-toggle="tooltip" data-original-title="" title="">عدد items</span></label>
+                    <div class="col-sm-9">
+                        <input type="number" name="numberOfItems" value="{{ pieces }}" placeholder="عدد items" id="input-inumberOfItems" class="form-control">
+                    </div>
+                </div>
+
+
+
+                <input type="hidden" name="delivery_country" value="{{ delivery_country }}">
+                <input type="hidden" name="currency" value="{{ currency }}">
+                <input type="hidden" name="order_id" value="{{ order_id }}">
+            </div>
+        </div>
+    </div>
+
+
+
+</form>
+<script>
+
+    $('.date').datetimepicker({
+        language: '{{ datepicker }}',
+        pickDate: true,
+        pickTime: true
+    });
+
+
+    $('select[name="is_cod"]').on('change', function () {
+
+        if($(this).val() == 1) {
+            $('#cod_amount_row').addClass('required');
+        } else  {
+            $('#cod_amount_row').removeClass('required');
+        }
+    });
+    $('select[name="is_cod"]').trigger('change');
+</script>

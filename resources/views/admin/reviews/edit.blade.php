@@ -12,7 +12,7 @@
             @csrf
             <div class="form-group">
                 <label for="reviewer_id">{{ trans('cruds.review.fields.reviewer') }}</label>
-                <select class="form-control select2 {{ $errors->has('reviewer') ? 'is-invalid' : '' }}" name="reviewer_id" id="reviewer_id">
+                <select class="form-control select2 {{ $errors->has('reviewer') ? 'is-invalid' : '' }}" name="reviewer_id" id="kt_select2_1">
                     @foreach($reviewers as $id => $entry)
                         <option value="{{ $id }}" {{ (old('reviewer_id') ? old('reviewer_id') : $review->reviewer->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                     @endforeach
@@ -26,7 +26,7 @@
             </div>
             <div class="form-group">
                 <label for="reviewed_id">{{ trans('cruds.review.fields.reviewed') }}</label>
-                <select class="form-control select2 {{ $errors->has('reviewed') ? 'is-invalid' : '' }}" name="reviewed_id" id="reviewed_id">
+                <select class="form-control select2 {{ $errors->has('reviewed') ? 'is-invalid' : '' }}" name="reviewed_id" id="kt_select2_2">
                     @foreach($revieweds as $id => $entry)
                         <option value="{{ $id }}" {{ (old('reviewed_id') ? old('reviewed_id') : $review->reviewed->id ?? '') == $id ? 'selected' : '' }}>{{ $entry }}</option>
                     @endforeach
@@ -40,13 +40,10 @@
             </div>
             <div class="form-group">
                 <label for="type">{{ trans('cruds.review.fields.type') }}</label>
-                <input class="form-control {{ $errors->has('type') ? 'is-invalid' : '' }}" type="number" name="type" id="type" value="{{ old('type', $review->type) }}" step="1">
-                @if($errors->has('type'))
-                    <div class="invalid-feedback">
-                        {{ $errors->first('type') }}
-                    </div>
-                @endif
-                <span class="help-block">{{ trans('cruds.review.fields.type_helper') }}</span>
+                <select name="type" class="form-control">
+                    <option value="1" {{ $review->type == 1 ? 'selected' : '' }}>تقييم مدرس</option>
+                    <option value="2" {{ $review->type == 2 ? 'selected' : '' }}>تقييم طالب</option>
+                </select>
             </div>
             <div class="form-group">
                 <label for="review">{{ trans('cruds.review.fields.review') }}</label>

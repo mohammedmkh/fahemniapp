@@ -12,6 +12,11 @@ class TutorsCourse extends Model
 
     public $table = 'tutors_courses';
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ] ;
     protected $dates = [
         'created_at',
         'updated_at',

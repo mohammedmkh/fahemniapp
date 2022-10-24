@@ -7,6 +7,7 @@ use App\Http\Requests\MassDestroyLevelRequest;
 use App\Http\Requests\StoreLevelRequest;
 use App\Http\Requests\UpdateLevelRequest;
 use App\Level;
+use App\User;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -68,7 +69,8 @@ class LevelsController extends Controller
     public function store(StoreLevelRequest $request)
     {
         $level = Level::create($request->all());
-
+        $message= 'api.added_successfully';
+        toastr()->success( __( $message) );
         return redirect()->route('admin.levels.index');
     }
 
@@ -82,7 +84,8 @@ class LevelsController extends Controller
     public function update(UpdateLevelRequest $request, Level $level)
     {
         $level->update($request->all());
-
+        $message= 'api.updated_successfully';
+        toastr()->success( __( $message) );
         return redirect()->route('admin.levels.index');
     }
 
@@ -95,11 +98,19 @@ class LevelsController extends Controller
 
     public function destroy(Level $level)
     {
-        abort_if(Gate::denies('level_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        $is_exist_user_has_this_country = User::where('level_id' ,$level->id )->first();
+        if( $is_exist_user_has_this_country ){
+            $message= 'api.cant_delete';
+            toastr()->error( __( $message) );
+            return back();
+        }
         $level->delete();
-
+        $message= 'api.delete_successfully';
+        toastr()->success( __( $message) );
         return back();
+
+
     }
 
     public function massDestroy(MassDestroyLevelRequest $request)

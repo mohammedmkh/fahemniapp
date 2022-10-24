@@ -23,7 +23,7 @@ class UsersController extends Controller
         abort_if(Gate::denies('user_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = User::with(['roles', 'country', 'level', 'university'])->select(sprintf('%s.*', (new User())->table));
+            $query = User::whereNotIn('role' , [2,3])->with(['roles', 'country', 'level', 'university'])->select(sprintf('%s.*', (new User())->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -57,7 +57,7 @@ class UsersController extends Controller
             $table->editColumn('roles', function ($row) {
                 $labels = [];
                 foreach ($row->roles as $role) {
-                    $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $role->title);
+                    $labels[] = sprintf('<span class="badge badge-light-success ">%s</span>', $role->title);
                 }
 
                 return implode(' ', $labels);
@@ -119,9 +119,19 @@ class UsersController extends Controller
         return view('admin.users.create', compact('roles', 'countries', 'levels', 'universities'));
     }
 
-    public function store(StoreUserRequest $request)
+    public function store(Request $request)
     {
+
+        $request->validate([
+
+            'email' => 'required|email|max:255|unique:users',
+
+        ]);
+
         $user = User::create($request->all());
+        $user->role = $request->roles[0] ;
+        $user->save();
+      //  dd($request->all());
         $user->roles()->sync($request->input('roles', []));
 
         return redirect()->route('admin.users.index');
@@ -165,9 +175,15 @@ class UsersController extends Controller
     {
         abort_if(Gate::denies('user_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+        if($user->id == 1){
+            toastr()->error('لا يمكن حذف هذا المستخدم');
+            return back();
+        }
         $user->delete();
-
+        toastr()->success('تم الحذف بنجاح');
         return back();
+
+
     }
 
     public function massDestroy(MassDestroyUserRequest $request)

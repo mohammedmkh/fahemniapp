@@ -4,9 +4,9 @@
     <div class="col-md-6">
         <div class="card mx-4">
             <div class="card-body p-4">
-                <h1>{{ trans('panel.site_title') }}</h1>
+                <h1 style="text-align: center">Fahemni App</h1>
 
-                <p class="text-muted">{{ trans('global.login') }}</p>
+                <p class="text-muted" style="text-align: center">الدخول للوحة التحكم</p>
 
                 @if(session('message'))
                     <div class="alert alert-info" role="alert">

@@ -33,9 +33,7 @@
                     <th>
                         {{ trans('cruds.conversation.fields.accept') }}
                     </th>
-                    <th>
-                        {{ trans('cruds.conversation.fields.end_conv') }}
-                    </th>
+
                     <th>
                         &nbsp;
                     </th>
@@ -96,12 +94,19 @@
 { data: 'user_name', name: 'user.name' },
 { data: 'tutor_name', name: 'tutor.name' },
 { data: 'accept', name: 'accept' },
-{ data: 'end_conv', name: 'end_conv' },
-{ data: 'actions', name: '{{ trans('global.actions') }}' }
+
+{ data: 'actions', name: '{{ trans('global.actions') }}',searchable:false , sortable:false  }
     ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
-    pageLength: 100,
+    pageLength: 100
+                    @if(session()->get('language') == 'ar')
+                ,
+                language :{
+                    url:"//cdn.datatables.net/plug-ins/1.10.25/i18n/Arabic.json",
+                    processing: "<img src='{{url('loading.gif')}}' id='processingloading'>",
+                }
+                    @endif
   };
   let table = $('.datatable-Conversation').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){

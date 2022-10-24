@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyCourseRequest;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
+use App\TutorsCourse;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -49,6 +50,12 @@ class CoursesController extends Controller
             $table->editColumn('name_en', function ($row) {
                 return $row->name_en ? $row->name_en : '';
             });
+            $table->editColumn('code', function ($row) {
+                return $row->code ? $row->code : '';
+            });
+            $table->editColumn('general', function ($row) {
+                return $row->parent == 0  ? 'نعم' : 'لا';
+            });
 
             $table->rawColumns(['actions', 'placeholder']);
 
@@ -62,26 +69,34 @@ class CoursesController extends Controller
     {
         abort_if(Gate::denies('course_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.courses.create');
+        $courses  = Course::where('parent' , 0)->get();
+        return view('admin.courses.create' , compact('courses'));
     }
 
     public function store(StoreCourseRequest $request)
     {
-        $course = Course::create($request->all());
+        $data = $request->all();
 
+
+        $course = Course::create($data);
+
+        toastr()->success('Data has been saved successfully!');
         return redirect()->route('admin.courses.index');
     }
 
     public function edit(Course $course)
     {
         abort_if(Gate::denies('course_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
-        return view('admin.courses.edit', compact('course'));
+        $courses  = Course::where('parent' , 0)->get();
+        return view('admin.courses.edit', compact('course' , 'courses'));
     }
 
-    public function update(UpdateCourseRequest $request, Course $course)
+    public function update(Request $request, Course $course)
     {
-        $course->update($request->all());
+       // dd($request->all());
+        $data = $request->all();
+
+        $course->update(  $data);
 
         return redirect()->route('admin.courses.index');
     }
@@ -95,8 +110,17 @@ class CoursesController extends Controller
 
     public function destroy(Course $course)
     {
-        abort_if(Gate::denies('course_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
+
+        $is_exist =  TutorsCourse::where('course_id' , $course->id)->first();
+        if(  $is_exist ){
+            $message= 'api.cant_delete';
+            toastr()->error( __( $message) );
+            return back();
+        }
+
+        $message= 'api.delete_successfully';
+        toastr()->success( __( $message) );
         $course->delete();
 
         return back();
